@@ -1,0 +1,11 @@
+name: pytorch
+channels:
+  - defaults
+dependencies:
+  - python=3.11
+  - pytorch-cuda=12.1
+  - pytorch==2.2.2
+  - torchaudio==2.2.2
+  - torchvision==0.17.2
+  - numpy=1.25
+prefix: D:\Anaconda\envs\pytorch
