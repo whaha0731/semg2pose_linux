@@ -283,10 +283,20 @@ class MultiFileWindowedEMGDataset(Dataset):
         if self.use_envelope:
             emg_envelope = []
             for channel in emg_t:
-                # Hilbert 变换 → 解析信号
-                analytic_signal = signal.hilbert(channel)
-                # 取幅度 → 瞬时包络
-                envelope = np.abs(analytic_signal)
+                # 步骤1: 镜像padding，减少边界效应
+                # 在信号两端进行镜像扩展，避免边界突变
+                pad_width = min(20, len(channel) // 4)  # padding长度，不超过信号长度的1/4
+                padded = np.pad(channel, pad_width=pad_width, mode='reflect')
+
+                # 步骤2: Hilbert 变换 → 解析信号
+                analytic_signal = signal.hilbert(padded)
+
+                # 步骤3: 取幅度 → 瞬时包络
+                envelope_padded = np.abs(analytic_signal)
+
+                # 步骤4: 移除padding部分，恢复原始长度
+                envelope = envelope_padded[pad_width:-pad_width]
+
                 emg_envelope.append(envelope)
             emg_t = np.stack(emg_envelope, axis=0)  # 替换为包络信号
 
